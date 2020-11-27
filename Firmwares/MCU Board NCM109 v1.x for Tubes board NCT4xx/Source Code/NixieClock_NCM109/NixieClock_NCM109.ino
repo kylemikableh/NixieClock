@@ -1,4 +1,4 @@
- const String FirmwareVersion = "015300";
+const String FirmwareVersion = "015300";
 #define HardwareVersion "MCU109 for 4XX Series."
 //Format                _X.XX__
 //NIXIE CLOCK NCM109 4xx v1.0 by GRA & AFCH (fominalec@gmail.com)
@@ -29,7 +29,7 @@
 //#define tubes4
 
 #include <SPI.h>
-#include <Wire.h>
+#include <WSWire.h> //Was hanging with Wire.h, unsure why but this tightened it up.
 #include <ClickButton.h>
 #include <TimeLib.h>
 #include <Tone.h>
@@ -316,28 +316,38 @@ void setup()
   
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   doTest();
+  Serial.println(F("HERE 1"));
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   if (LEDsLock == 1)
   {
     setLEDsFromEEPROM();
   }
+  Serial.println(F("HERE 2"));
   getRTCTime();
+  Serial.println(F("HERE 3"));
   byte prevSeconds=RTC_seconds;
+  Serial.println(F("HERE 4"));
   unsigned long RTC_ReadingStartTime=millis();
+  Serial.println(F("HERE 5"));
   RTC_present=true;
+  Serial.println(F("HERE 6"));
   while(prevSeconds==RTC_seconds)
   {
+    Serial.println(F("HERE 7"));
     getRTCTime();
     //Serial.println(RTC_seconds);
     if ((millis()-RTC_ReadingStartTime)>3000)
     {
+      Serial.println(F("HERE 8"));
       Serial.println(F("Warning! RTC DON'T RESPOND!"));
       RTC_present=false;
       break;
     }
   }
+  Serial.println(F("HERE 9"));
   setTime(RTC_hours, RTC_minutes, RTC_seconds, RTC_day, RTC_month, RTC_year);
   setRTCDateTime(RTC_hours, RTC_minutes, RTC_seconds, RTC_day, RTC_month, RTC_year, 1); //записываем только что считанное время в RTC чтобы запустить новую микросхему
+  Serial.println(F("HERE 10"));
 }
 
 int rotator = 0; //index in array with RGB "rules" (increse by one on each 255 cycles)
@@ -764,7 +774,7 @@ void doTest()
     doIndication();  
   }
 
-  testDS3231TempSensor();
+  //testDS3231TempSensor();
    
   Serial.println(F("Stop Test"));
 }
@@ -806,11 +816,16 @@ byte bcdToDec(byte val)  {
 
 void getRTCTime()
 {
+  Serial.println(F("HERE 20"));
   Wire.beginTransmission(DS1307_ADDRESS);
+  Serial.println(F("HERE 21"));
   Wire.write(zero);
+  Serial.println(F("HERE 22"));
   Wire.endTransmission();
+  Serial.println(F("HERE 23"));
 
   Wire.requestFrom(DS1307_ADDRESS, 7);
+  Serial.println(F("HERE 24"));
 
   RTC_seconds = bcdToDec(Wire.read());
   RTC_minutes = bcdToDec(Wire.read());
@@ -819,6 +834,7 @@ void getRTCTime()
   RTC_day = bcdToDec(Wire.read());
   RTC_month = bcdToDec(Wire.read());
   RTC_year = bcdToDec(Wire.read());
+  Serial.println(F("HERE 25"));
 }
 
 
